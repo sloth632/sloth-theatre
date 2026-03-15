@@ -5,115 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SLOTH theatre</title>
 <style>
-body {
-  margin: 0;
-  font-family: Arial;
-  background: #0f1115;
-  color: white;
-}
-header {
-  background: #111827;
-  padding: 20px;
-  text-align: center;
-  font-size: 26px;
-  font-weight: bold;
-  cursor: pointer;
-  color: #00bfff;
-  transition: 0.3s;
-}
-header:hover { color: #00e0ff; }
-
-#controls {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  padding: 20px;
-}
-#search-input {
-  padding: 10px;
-  width: 300px;
-  border-radius: 10px;
-  border: none;
-  outline: none;
-  background: #1f2937;
-  color: white;
-}
-#search-btn {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 10px;
-  background: #00bfff;
-  cursor: pointer;
-  color: white;
-  font-weight: bold;
-}
-
-#results {
-  display: grid;
-  grid-template-columns: repeat(auto-fill,minmax(150px,1fr));
-  gap: 15px;
-  padding: 20px;
-}
-
-.card {
-  background: #1f2937;
-  border-radius: 10px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.card:hover { transform: scale(1.05); }
-.card img { width: 100%; }
-.card .info { padding: 10px; }
-
-#loader {
-  display: none;
-  margin: auto;
-  border: 6px solid #222;
-  border-top: 6px solid #00bfff;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
-}
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-#player-page {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: #0f1115;
-  display: none;
-  flex-direction: column;
-}
-
-#player-topbar {
-  padding: 10px;
-  background: #111827;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-#player {
-  width: 100%;
-  height: 80%;
-  border: none;
-}
-
-select {
-  padding: 6px;
-  border-radius: 6px;
-  margin-right: 5px;
-}
-
-@media(max-width:600px){
-  #search-input { width: 70%; }
-  #player { height: 60%; }
-}
+body {margin:0;font-family:Arial;background:#0f1115;color:white;}
+header {background:#111827;padding:20px;text-align:center;font-size:26px;font-weight:bold;cursor:pointer;color:#00bfff;}
+header:hover {color:#00e0ff;}
+#controls {display:flex;justify-content:center;gap:10px;padding:20px;}
+#search-input {padding:10px;width:300px;border-radius:10px;border:none;outline:none;background:#1f2937;color:white;}
+#search-btn {padding:10px 15px;border:none;border-radius:10px;background:#00bfff;cursor:pointer;color:white;font-weight:bold;}
+#results {display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:15px;padding:20px;}
+.card {background:#1f2937;border-radius:10px;overflow:hidden;cursor:pointer;transition:0.2s;}
+.card:hover {transform:scale(1.05);}
+.card img {width:100%;}
+.card .info {padding:10px;}
+#loader {display:none;margin:auto;border:6px solid #222;border-top:6px solid #00bfff;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite;}
+@keyframes spin {0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+#player-page {position:fixed;top:0;left:0;width:100%;height:100%;background:#0f1115;display:none;flex-direction:column;}
+#player-topbar {padding:10px;background:#111827;display:flex;gap:10px;align-items:center;}
+#player {width:100%;height:80%;border:none;border-radius:10px;}
+select {padding:6px;border-radius:6px;background:#1f2937;color:white;border:none;}
+button:hover {opacity:0.8;}
 </style>
 </head>
 <body>
@@ -121,32 +30,29 @@ select {
 <header id="home-btn">SLOTH theatre</header>
 
 <div id="controls">
-  <input id="search-input" placeholder="Search movies / shows / anime">
+  <input id="search-input" placeholder="Search movies / shows">
   <button id="search-btn">Search</button>
 </div>
 
 <div id="loader"></div>
 <div id="results"></div>
 
-<!-- Player Page -->
 <div id="player-page">
   <div id="player-topbar">
-    <button id="back-btn">← Back</button>
+    <button id="back-btn">Back</button>
     <span id="player-title"></span>
   </div>
   <iframe id="player" allowfullscreen></iframe>
   <div style="padding:10px">
-    <select id="season-select" style="display:none"></select>
-    <select id="episode-select" style="display:none"></select>
+    <select id="season-select"></select>
+    <select id="episode-select"></select>
   </div>
 </div>
 
 <script>
-// Backend URL (your Cloudflare Worker)
 const BACKEND_URL = "https://sloth-backend.tebin-kurdish-dev.workers.dev";
 
-let currentType = null;
-let currentId = null;
+let currentType, currentId;
 
 const results = document.getElementById("results");
 const loader = document.getElementById("loader");
@@ -155,132 +61,130 @@ const player = document.getElementById("player");
 const seasonSelect = document.getElementById("season-select");
 const episodeSelect = document.getElementById("episode-select");
 
-// Fetch trending content
-async function fetchTrending() {
-  loader.style.display = "block";
-  results.innerHTML = "";
+async function fetchTrending(){
+  loader.style.display="block";
   try {
     const r = await fetch(`${BACKEND_URL}/api/trending`);
     const data = await r.json();
+    loader.style.display="none";
     displayResults(data);
-  } catch (err) {
-    console.error(err);
-    results.innerHTML = '<p style="text-align:center;">Failed to load trending.</p>';
-  } finally {
-    loader.style.display = "none";
+  } catch {
+    loader.style.display="none";
+    results.innerHTML="<p style='text-align:center;color:#bbb;'>Failed to load trending</p>";
   }
 }
 
-// Search content
-async function searchAll(query) {
-  loader.style.display = "block";
-  results.innerHTML = "";
+async function searchAll(query){
+  loader.style.display="block";
   try {
     const r = await fetch(`${BACKEND_URL}/api/search?q=${encodeURIComponent(query)}`);
     const data = await r.json();
+    loader.style.display="none";
     displayResults(data);
-  } catch (err) {
-    console.error(err);
-    results.innerHTML = '<p style="text-align:center;">Search failed.</p>';
-  } finally {
-    loader.style.display = "none";
+  } catch {
+    loader.style.display="none";
+    results.innerHTML="<p style='text-align:center;color:#bbb;'>Search failed</p>";
   }
 }
 
-// Display results
-function displayResults(items) {
-  results.innerHTML = "";
-  items.forEach(item => {
+function displayResults(items){
+  results.innerHTML="";
+  if(!items || items.length===0){
+    results.innerHTML="<p style='text-align:center;color:#bbb;'>No results found</p>";
+    return;
+  }
+  items.forEach(item=>{
     const card = document.createElement("div");
-    card.className = "card";
+    card.className="card";
     card.innerHTML = `
-      <img src="https://image.tmdb.org/t/p/w300${item.poster_path}" alt="${item.title||item.name}">
+      <img src="https://image.tmdb.org/t/p/w300${item.poster_path}">
       <div class="info">
         <h3>${item.title||item.name}</h3>
-        <p>${item.type.toUpperCase()} | ⭐ ${item.vote_average}</p>
-      </div>
-    `;
+        <p>${item.type.toUpperCase()} | ⭐ ${item.vote_average||"N/A"}</p>
+      </div>`;
     card.onclick = () => loadPlayer(item);
     results.appendChild(card);
   });
 }
 
-// Load player
-async function loadPlayer(item) {
+async function loadPlayer(item){
   currentType = item.type;
   currentId = item.id;
   document.getElementById("player-title").textContent = item.title||item.name;
-  playerPage.style.display = "flex";
-  if (item.type === "movie") {
-    player.src = `https://vidsrc.cc/v3/embed/movie/${item.id}`;
-    seasonSelect.style.display = "none";
-    episodeSelect.style.display = "none";
+  playerPage.style.display="flex";
+
+  if(item.type==="movie"){
+    player.src = `https://vidsrc.cc/v3/embed/movie/${item.id}?autoPlay=false`;
+    seasonSelect.style.display="none";
+    episodeSelect.style.display="none";
   } else {
-    seasonSelect.style.display = "inline";
-    episodeSelect.style.display = "inline";
-    const r = await fetch(`${BACKEND_URL}/api/tv/${item.id}`);
-    const data = await r.json();
-    seasonSelect.innerHTML = "";
-    for (let i=1; i<=data.number_of_seasons; i++) {
-      const o = document.createElement("option");
-      o.value = i; o.text = `Season ${i}`;
-      seasonSelect.appendChild(o);
+    seasonSelect.style.display="inline";
+    episodeSelect.style.display="inline";
+    try {
+      const r = await fetch(`${BACKEND_URL}/api/tv/${item.id}`);
+      const data = await r.json();
+      seasonSelect.innerHTML="";
+      for(let i=1;i<=data.number_of_seasons;i++){
+        const o=document.createElement("option");
+        o.value=i; o.text=`Season ${i}`;
+        seasonSelect.appendChild(o);
+      }
+      loadEpisodes(data);
+    } catch {
+      console.error("Failed to fetch TV details");
     }
-    loadEpisodes(data);
   }
 }
 
-// Load episodes for selected season
-function loadEpisodes(data) {
+function loadEpisodes(data){
   const s = seasonSelect.value || 1;
-  episodeSelect.innerHTML = "";
+  episodeSelect.innerHTML="";
   const total = data.seasons[s-1]?.episode_count || 1;
-  for (let i=1; i<=total; i++) {
-    const o = document.createElement("option");
-    o.value = i; o.text = `Episode ${i}`;
+  for(let i=1;i<=total;i++){
+    const o=document.createElement("option");
+    o.value=i; o.text=`Episode ${i}`;
     episodeSelect.appendChild(o);
   }
   updateTV();
 }
 
-// Update TV player
-function updateTV() {
-  const s = seasonSelect.value || 1;
-  const e = episodeSelect.value || 1;
-  player.src = `https://vidsrc.cc/v3/embed/tv/${currentId}/${s}/${e}`;
+function updateTV(){
+  const s = seasonSelect.value;
+  const e = episodeSelect.value;
+  player.src = `https://vidsrc.cc/v3/embed/tv/${currentId}/${s}/${e}?autoPlay=false`;
 }
 
-// Event listeners
 seasonSelect.onchange = async () => {
-  const r = await fetch(`${BACKEND_URL}/api/tv/${currentId}`);
-  const data = await r.json();
-  loadEpisodes(data);
-}
+  try {
+    const r = await fetch(`${BACKEND_URL}/api/tv/${currentId}`);
+    const data = await r.json();
+    loadEpisodes(data);
+  } catch {}
+};
+
 episodeSelect.onchange = updateTV;
 
 document.getElementById("search-btn").onclick = () => {
   const q = document.getElementById("search-input").value.trim();
   if(q) searchAll(q);
   else fetchTrending();
-}
+};
 
 document.getElementById("search-input").addEventListener("keypress", e => {
-  if(e.key === "Enter") {
-    const q = e.target.value.trim();
+  if(e.key==="Enter"){
+    const q=e.target.value.trim();
     if(q) searchAll(q);
     else fetchTrending();
   }
 });
 
 document.getElementById("back-btn").onclick = () => {
-  playerPage.style.display = "none";
-  player.src = "";
-}
+  playerPage.style.display="none";
+  player.src="";
+};
 
-// Home button
 document.getElementById("home-btn").onclick = fetchTrending;
 
-// Load initial trending
 fetchTrending();
 </script>
 </body>
