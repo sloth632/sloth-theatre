@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SLOTH theatre</title>
 <style>
-/* Global */
 body {
   margin:0;
   font-family: Arial, sans-serif;
@@ -24,132 +23,40 @@ header {
   transition: 0.3s;
 }
 header:hover { color:#00e0ff; }
-
-#controls { display:flex; justify-content:center; align-items:center; gap:10px; padding:20px; flex-wrap:wrap; }
-#search-input {
-  width:300px;
-  padding:10px;
-  border-radius:12px;
-  border:none;
-  outline:none;
-  font-size:16px;
-  background: rgba(0,191,255,0.1);
+#ad-warning {
+  text-align:center;
+  background: #ff4c4c;
   color:#fff;
-  backdrop-filter: blur(5px);
-}
-#search-btn {
-  padding:10px 15px;
-  border:none;
-  border-radius:12px;
-  background: rgba(0,191,255,0.3);
-  cursor:pointer;
-  color:#fff;
+  padding:6px 0;
+  font-size:14px;
   font-weight:bold;
-  transition:0.2s;
 }
+#controls { display:flex; justify-content:center; align-items:center; gap:10px; padding:20px; flex-wrap:wrap; }
+#search-input { width:300px; padding:10px; border-radius:12px; border:none; outline:none; font-size:16px; background: rgba(0,191,255,0.1); color:#fff; backdrop-filter: blur(5px); }
+#search-btn { padding:10px 15px; border:none; border-radius:12px; background: rgba(0,191,255,0.3); cursor:pointer; color:#fff; font-weight:bold; transition:0.2s; }
 #search-btn:hover { background: rgba(0,191,255,0.6); }
-
-#results {
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
-  gap:15px;
-  padding:20px;
-}
-
-.card {
-  background: rgba(20,30,50,0.7);
-  border-radius:12px;
-  overflow:hidden;
-  cursor:pointer;
-  transition: transform 0.2s, box-shadow 0.3s;
-  backdrop-filter: blur(5px);
-}
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 20px rgba(0,191,255,0.5);
-}
+#results { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:15px; padding:20px; }
+.card { background: rgba(20,30,50,0.7); border-radius:12px; overflow:hidden; cursor:pointer; transition: transform 0.2s, box-shadow 0.3s; backdrop-filter: blur(5px); }
+.card:hover { transform: translateY(-5px); box-shadow: 0 5px 20px rgba(0,191,255,0.5); }
 .card img { width:100%; display:block; border-bottom: 1px solid rgba(255,255,255,0.1); }
 .card .info { padding:10px; }
 .card .info h3 { margin:5px 0; font-size:16px; }
 .card .info p { margin:0; font-size:14px; color:#ccc; }
-
-#loader {
-  display:none;
-  border:6px solid rgba(0,191,255,0.2);
-  border-top:6px solid #00bfff;
-  border-radius:50%;
-  width:50px;
-  height:50px;
-  animation:spin 1s linear infinite;
-  margin:40px auto;
-}
+#loader { display:none; border:6px solid rgba(0,191,255,0.2); border-top:6px solid #00bfff; border-radius:50%; width:50px; height:50px; animation:spin 1s linear infinite; margin:40px auto; }
 @keyframes spin{ 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
-
-#player-page{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:#0f1115;
-  z-index:999;
-  display:none;
-  flex-direction:column;
-}
-
-#player-topbar{
-  display:flex;
-  align-items:center;
-  gap:15px;
-  padding:15px;
-  background:#111827;
-}
-
-#back-btn{
-  background:#00bfff;
-  border:none;
-  padding:8px 14px;
-  border-radius:8px;
-  cursor:pointer;
-  color:white;
-}
-
-#player-wrapper{
-  flex:1;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-}
-
-#player{
-  width:90%;
-  height:80%;
-  border:none;
-  border-radius:12px;
-}
-
-#player-controls{
-  margin:10px 20px;
-}
-select {
-  padding:5px;
-  border-radius:8px;
-  border:none;
-  outline:none;
-  font-size:14px;
-  background: rgba(0,191,255,0.1);
-  color:#fff;
-  backdrop-filter: blur(5px);
-}
-
-@media(max-width:600px){
-  #search-input{width:70%;}
-  #player{height:60%;}
-}
+#player-page{ position:fixed; top:0; left:0; width:100%; height:100%; background:#0f1115; z-index:999; display:none; flex-direction:column; }
+#player-topbar{ display:flex; align-items:center; gap:15px; padding:15px; background:#111827; }
+#back-btn{ background:#00bfff; border:none; padding:8px 14px; border-radius:8px; cursor:pointer; color:white; }
+#player-wrapper{ flex:1; display:flex; justify-content:center; align-items:center; }
+#player{ width:90%; height:80%; border:none; border-radius:12px; }
+#player-controls{ margin:10px 20px; }
+select { padding:5px; border-radius:8px; border:none; outline:none; font-size:14px; background: rgba(0,191,255,0.1); color:#fff; backdrop-filter: blur(5px); }
+@media(max-width:600px){ #search-input{width:70%;} #player{height:60%;} }
 </style>
 </head>
 <body>
 
+<div id="ad-warning">USE AD BLOCKER FOR BEST EXPERIENCE</div>
 <header id="home-btn">SLOTH theatre</header>
 
 <div id="controls">
@@ -160,10 +67,9 @@ select {
 <div id="loader"></div>
 <div id="results"></div>
 
-<!-- Player Page -->
 <div id="player-page">
   <div id="player-topbar">
-    <button id="back-btn">← Back</button>
+    <button id="back-btn"> Back</button>
     <span id="player-title"></span>
   </div>
   <div id="player-wrapper">
@@ -199,11 +105,7 @@ const seasonEpisodeControls=document.getElementById('season-episode-controls');
 searchBtn.addEventListener('click', ()=>{ const query=searchInput.value.trim(); if(query===''){ fetchTrending(); }else{ searchAll(query); } });
 searchInput.addEventListener('keypress', e=>{ if(e.key==='Enter'){ const query=searchInput.value.trim(); if(query===''){ fetchTrending(); }else{ searchAll(query); } }});
 homeBtn.addEventListener('click', fetchTrending);
-backBtn.addEventListener('click', ()=>{
-  playerPage.style.display='none';
-  document.getElementById('controls').style.display='flex';
-  resultsDiv.style.display='grid';
-});
+backBtn.addEventListener('click', ()=>{ playerPage.style.display='none'; document.getElementById('controls').style.display='flex'; resultsDiv.style.display='grid'; });
 
 async function searchAll(query){
     loader.style.display='block';
@@ -242,12 +144,7 @@ function displayResults(items){
     items.forEach(item=>{
         const card=document.createElement('div');
         card.className='card';
-        card.innerHTML=`
-            <img src="https://image.tmdb.org/t/p/w300${item.poster_path}" alt="${item.title||item.name}">
-            <div class="info">
-                <h3>${item.title||item.name}</h3>
-                <p>${item.type.toUpperCase()} | Rating: ${item.vote_average||'N/A'}</p>
-            </div>`;
+        card.innerHTML=`<img src="https://image.tmdb.org/t/p/w300${item.poster_path}" alt="${item.title||item.name}"><div class="info"><h3>${item.title||item.name}</h3><p>${item.type.toUpperCase()} | Rating: ${item.vote_average||'N/A'}</p></div>`;
         card.addEventListener('click',()=>loadPlayer(item.id,item.type,item.title||item.name));
         resultsDiv.appendChild(card);
     });
@@ -261,20 +158,14 @@ async function loadPlayer(id,type,title){
     document.getElementById('controls').style.display='none';
     resultsDiv.style.display='none';
     seasonEpisodeControls.style.display='none';
-
-    if(type==='movie'){
-        playerIframe.src=`https://vidsrc.cc/v3/embed/movie/${id}?autoPlay=false`;
-    } else {
+    if(type==='movie'){ playerIframe.src=`https://vidsrc.cc/v3/embed/movie/${id}?autoPlay=false`; }
+    else{
         seasonEpisodeControls.style.display='flex';
         const res=await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}`);
         const data=await res.json();
         seasonSelect.innerHTML='';
         episodeSelect.innerHTML='';
-        for(let i=1;i<=data.number_of_seasons;i++){
-            const opt=document.createElement('option');
-            opt.value=i; opt.text=`Season ${i}`;
-            seasonSelect.appendChild(opt);
-        }
+        for(let i=1;i<=data.number_of_seasons;i++){ const opt=document.createElement('option'); opt.value=i; opt.text=`Season ${i}`; seasonSelect.appendChild(opt); }
         loadEpisodes(data);
     }
 }
@@ -283,24 +174,18 @@ function loadEpisodes(tvData){
     const season=parseInt(seasonSelect.value||1);
     episodeSelect.innerHTML='';
     const totalEpisodes=tvData.seasons[season-1]?.episode_count||1;
-    for(let i=1;i<=totalEpisodes;i++){
-        const opt=document.createElement('option');
-        opt.value=i; opt.text=`Episode ${i}`;
-        episodeSelect.appendChild(opt);
-    }
+    for(let i=1;i<=totalEpisodes;i++){ const opt=document.createElement('option'); opt.value=i; opt.text=`Episode ${i}`; episodeSelect.appendChild(opt); }
     updateTVPlayer();
 }
 
-function updateTVPlayer(){
-    const season=parseInt(seasonSelect.value||1);
-    const episode=parseInt(episodeSelect.value||1);
-    playerIframe.src=`https://vidsrc.cc/v3/embed/tv/${currentItemId}/${season}/${episode}?autoPlay=false`;
-}
+function updateTVPlayer(){ const season=parseInt(seasonSelect.value||1); const episode=parseInt(episodeSelect.value||1); playerIframe.src=`https://vidsrc.cc/v3/embed/tv/${currentItemId}/${season}/${episode}?autoPlay=false`; }
 
-seasonSelect.addEventListener('change',()=>{ 
-    fetch(`https://api.themoviedb.org/3/tv/${currentItemId}?api_key=${API_KEY}`).then(r=>r.json()).then(data=>loadEpisodes(data));
-});
+seasonSelect.addEventListener('change',()=>{ fetch(`https://api.themoviedb.org/3/tv/${currentItemId}?api_key=${API_KEY}`).then(r=>r.json()).then(data=>loadEpisodes(data)); });
 episodeSelect.addEventListener('change',updateTVPlayer);
+
+document.getElementById('search-btn').onclick=()=>{ const q=document.getElementById('search-input').value; if(q) searchAll(q); else fetchTrending(); };
+document.getElementById('search-input').addEventListener('keypress',e=>{ if(e.key==="Enter"){ const q=e.target.value; if(q) searchAll(q); else fetchTrending(); }});
+document.getElementById('back-btn').onclick=()=>{ playerPage.style.display='none'; playerIframe.src=""; };
 
 fetchTrending();
 </script>
