@@ -5,24 +5,147 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SLOTH theatre</title>
 <style>
-body {margin:0;font-family:Arial;background:#0f1115;color:white;}
-header {background:#111827;padding:20px;text-align:center;font-size:26px;font-weight:bold;cursor:pointer;color:#00bfff;}
-header:hover {color:#00e0ff;}
-#controls {display:flex;justify-content:center;gap:10px;padding:20px;}
-#search-input {padding:10px;width:300px;border-radius:10px;border:none;outline:none;background:#1f2937;color:white;}
-#search-btn {padding:10px 15px;border:none;border-radius:10px;background:#00bfff;cursor:pointer;color:white;font-weight:bold;}
-#results {display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:15px;padding:20px;}
-.card {background:#1f2937;border-radius:10px;overflow:hidden;cursor:pointer;transition:0.2s;}
-.card:hover {transform:scale(1.05);}
-.card img {width:100%;}
-.card .info {padding:10px;}
-#loader {display:none;margin:auto;border:6px solid #222;border-top:6px solid #00bfff;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite;}
-@keyframes spin {0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
-#player-page {position:fixed;top:0;left:0;width:100%;height:100%;background:#0f1115;display:none;flex-direction:column;}
-#player-topbar {padding:10px;background:#111827;display:flex;gap:10px;align-items:center;}
-#player {width:100%;height:80%;border:none;border-radius:10px;}
-select {padding:6px;border-radius:6px;background:#1f2937;color:white;border:none;}
-button:hover {opacity:0.8;}
+/* Global */
+body {
+  margin:0;
+  font-family: Arial, sans-serif;
+  background:#0f1115;
+  color:#fff;
+}
+header {
+  background: rgba(10,20,40,0.8);
+  padding:20px;
+  text-align:center;
+  font-size:2rem;
+  font-weight:bold;
+  cursor:pointer;
+  backdrop-filter: blur(10px);
+  color:#00bfff;
+  transition: 0.3s;
+}
+header:hover { color:#00e0ff; }
+
+#controls { display:flex; justify-content:center; align-items:center; gap:10px; padding:20px; flex-wrap:wrap; }
+#search-input {
+  width:300px;
+  padding:10px;
+  border-radius:12px;
+  border:none;
+  outline:none;
+  font-size:16px;
+  background: rgba(0,191,255,0.1);
+  color:#fff;
+  backdrop-filter: blur(5px);
+}
+#search-btn {
+  padding:10px 15px;
+  border:none;
+  border-radius:12px;
+  background: rgba(0,191,255,0.3);
+  cursor:pointer;
+  color:#fff;
+  font-weight:bold;
+  transition:0.2s;
+}
+#search-btn:hover { background: rgba(0,191,255,0.6); }
+
+#results {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+  gap:15px;
+  padding:20px;
+}
+
+.card {
+  background: rgba(20,30,50,0.7);
+  border-radius:12px;
+  overflow:hidden;
+  cursor:pointer;
+  transition: transform 0.2s, box-shadow 0.3s;
+  backdrop-filter: blur(5px);
+}
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 20px rgba(0,191,255,0.5);
+}
+.card img { width:100%; display:block; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.card .info { padding:10px; }
+.card .info h3 { margin:5px 0; font-size:16px; }
+.card .info p { margin:0; font-size:14px; color:#ccc; }
+
+#loader {
+  display:none;
+  border:6px solid rgba(0,191,255,0.2);
+  border-top:6px solid #00bfff;
+  border-radius:50%;
+  width:50px;
+  height:50px;
+  animation:spin 1s linear infinite;
+  margin:40px auto;
+}
+@keyframes spin{ 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
+
+#player-page{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:#0f1115;
+  z-index:999;
+  display:none;
+  flex-direction:column;
+}
+
+#player-topbar{
+  display:flex;
+  align-items:center;
+  gap:15px;
+  padding:15px;
+  background:#111827;
+}
+
+#back-btn{
+  background:#00bfff;
+  border:none;
+  padding:8px 14px;
+  border-radius:8px;
+  cursor:pointer;
+  color:white;
+}
+
+#player-wrapper{
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+#player{
+  width:90%;
+  height:80%;
+  border:none;
+  border-radius:12px;
+}
+
+#player-controls{
+  margin:10px 20px;
+}
+select {
+  padding:5px;
+  border-radius:8px;
+  border:none;
+  outline:none;
+  font-size:14px;
+  background: rgba(0,191,255,0.1);
+  color:#fff;
+  backdrop-filter: blur(5px);
+}
+
+@media(max-width:600px){
+  #search-input{width:70%;}
+  #player{height:60%;}
+}
 </style>
 </head>
 <body>
@@ -30,160 +153,154 @@ button:hover {opacity:0.8;}
 <header id="home-btn">SLOTH theatre</header>
 
 <div id="controls">
-  <input id="search-input" placeholder="Search movies / shows">
+  <input type="text" id="search-input" placeholder="Search Movies / TV Shows / Anime">
   <button id="search-btn">Search</button>
 </div>
 
 <div id="loader"></div>
 <div id="results"></div>
 
+<!-- Player Page -->
 <div id="player-page">
   <div id="player-topbar">
-    <button id="back-btn">Back</button>
+    <button id="back-btn">← Back</button>
     <span id="player-title"></span>
   </div>
-  <iframe id="player" allowfullscreen></iframe>
-  <div style="padding:10px">
-    <select id="season-select"></select>
-    <select id="episode-select"></select>
+  <div id="player-wrapper">
+    <iframe id="player" allowfullscreen></iframe>
+  </div>
+  <div id="player-controls">
+    <div id="season-episode-controls" style="display:none;">
+      <select id="season-select"></select>
+      <select id="episode-select"></select>
+    </div>
   </div>
 </div>
 
 <script>
-const BACKEND_URL = "https://sloth-backend.tebin-kurdish-dev.workers.dev";
+const API_KEY="35f7935f6eef2c34022928212260b128";
+let currentType='movie';
+let currentItemId=null;
 
-let currentType, currentId;
+const searchInput=document.getElementById('search-input');
+const searchBtn=document.getElementById('search-btn');
+const homeBtn=document.getElementById('home-btn');
+const resultsDiv=document.getElementById('results');
+const loader=document.getElementById('loader');
 
-const results = document.getElementById("results");
-const loader = document.getElementById("loader");
-const playerPage = document.getElementById("player-page");
-const player = document.getElementById("player");
-const seasonSelect = document.getElementById("season-select");
-const episodeSelect = document.getElementById("episode-select");
+const playerPage=document.getElementById('player-page');
+const playerIframe=document.getElementById('player');
+const backBtn=document.getElementById('back-btn');
+const playerTitle=document.getElementById('player-title');
+const seasonSelect=document.getElementById('season-select');
+const episodeSelect=document.getElementById('episode-select');
+const seasonEpisodeControls=document.getElementById('season-episode-controls');
 
-async function fetchTrending(){
-  loader.style.display="block";
-  try {
-    const r = await fetch(`${BACKEND_URL}/api/trending`);
-    const data = await r.json();
-    loader.style.display="none";
-    displayResults(data);
-  } catch {
-    loader.style.display="none";
-    results.innerHTML="<p style='text-align:center;color:#bbb;'>Failed to load trending</p>";
-  }
-}
+searchBtn.addEventListener('click', ()=>{ const query=searchInput.value.trim(); if(query===''){ fetchTrending(); }else{ searchAll(query); } });
+searchInput.addEventListener('keypress', e=>{ if(e.key==='Enter'){ const query=searchInput.value.trim(); if(query===''){ fetchTrending(); }else{ searchAll(query); } }});
+homeBtn.addEventListener('click', fetchTrending);
+backBtn.addEventListener('click', ()=>{
+  playerPage.style.display='none';
+  document.getElementById('controls').style.display='flex';
+  resultsDiv.style.display='grid';
+});
 
 async function searchAll(query){
-  loader.style.display="block";
-  try {
-    const r = await fetch(`${BACKEND_URL}/api/search?q=${encodeURIComponent(query)}`);
-    const data = await r.json();
-    loader.style.display="none";
-    displayResults(data);
-  } catch {
-    loader.style.display="none";
-    results.innerHTML="<p style='text-align:center;color:#bbb;'>Search failed</p>";
-  }
+    loader.style.display='block';
+    resultsDiv.innerHTML='';
+    playerPage.style.display='none';
+    try{
+        const [movies,tv]=await Promise.all([
+            fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}`),
+            fetch(`https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(query)}`)
+        ]);
+        const movieData=await movies.json();
+        const tvData=await tv.json();
+        loader.style.display='none';
+        displayResults([...movieData.results.map(r=>({...r,type:'movie'})),...tvData.results.map(r=>({...r,type:'tv'}))]);
+    }catch(err){console.error(err);loader.style.display='none';resultsDiv.innerHTML='<p style="text-align:center;">Error fetching results.</p>';}
+}
+
+async function fetchTrending(){
+    loader.style.display='block';
+    resultsDiv.innerHTML='';
+    playerPage.style.display='none';
+    try{
+        const [movies,tv]=await Promise.all([
+            fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`),
+            fetch(`https://api.themoviedb.org/3/trending/tv/week?api_key=${API_KEY}`)
+        ]);
+        const movieData=await movies.json();
+        const tvData=await tv.json();
+        loader.style.display='none';
+        displayResults([...movieData.results.map(r=>({...r,type:'movie'})),...tvData.results.map(r=>({...r,type:'tv'}))]);
+    }catch(err){console.error(err);loader.style.display='none';resultsDiv.innerHTML='<p style="text-align:center;">Error fetching trending movies and tv series</p>';}
 }
 
 function displayResults(items){
-  results.innerHTML="";
-  if(!items || items.length===0){
-    results.innerHTML="<p style='text-align:center;color:#bbb;'>No results found</p>";
-    return;
-  }
-  items.forEach(item=>{
-    const card = document.createElement("div");
-    card.className="card";
-    card.innerHTML = `
-      <img src="https://image.tmdb.org/t/p/w300${item.poster_path}">
-      <div class="info">
-        <h3>${item.title||item.name}</h3>
-        <p>${item.type.toUpperCase()} | ⭐ ${item.vote_average||"N/A"}</p>
-      </div>`;
-    card.onclick = () => loadPlayer(item);
-    results.appendChild(card);
-  });
+    resultsDiv.innerHTML='';
+    items.forEach(item=>{
+        const card=document.createElement('div');
+        card.className='card';
+        card.innerHTML=`
+            <img src="https://image.tmdb.org/t/p/w300${item.poster_path}" alt="${item.title||item.name}">
+            <div class="info">
+                <h3>${item.title||item.name}</h3>
+                <p>${item.type.toUpperCase()} | Rating: ${item.vote_average||'N/A'}</p>
+            </div>`;
+        card.addEventListener('click',()=>loadPlayer(item.id,item.type,item.title||item.name));
+        resultsDiv.appendChild(card);
+    });
 }
 
-async function loadPlayer(item){
-  currentType = item.type;
-  currentId = item.id;
-  document.getElementById("player-title").textContent = item.title||item.name;
-  playerPage.style.display="flex";
+async function loadPlayer(id,type,title){
+    currentItemId=id;
+    currentType=type;
+    playerTitle.textContent=title;
+    playerPage.style.display='flex';
+    document.getElementById('controls').style.display='none';
+    resultsDiv.style.display='none';
+    seasonEpisodeControls.style.display='none';
 
-  if(item.type==="movie"){
-    player.src = `https://vidsrc.cc/v3/embed/movie/${item.id}?autoPlay=false`;
-    seasonSelect.style.display="none";
-    episodeSelect.style.display="none";
-  } else {
-    seasonSelect.style.display="inline";
-    episodeSelect.style.display="inline";
-    try {
-      const r = await fetch(`${BACKEND_URL}/api/tv/${item.id}`);
-      const data = await r.json();
-      seasonSelect.innerHTML="";
-      for(let i=1;i<=data.number_of_seasons;i++){
-        const o=document.createElement("option");
-        o.value=i; o.text=`Season ${i}`;
-        seasonSelect.appendChild(o);
-      }
-      loadEpisodes(data);
-    } catch {
-      console.error("Failed to fetch TV details");
+    if(type==='movie'){
+        playerIframe.src=`https://vidsrc.cc/v3/embed/movie/${id}?autoPlay=false`;
+    } else {
+        seasonEpisodeControls.style.display='flex';
+        const res=await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}`);
+        const data=await res.json();
+        seasonSelect.innerHTML='';
+        episodeSelect.innerHTML='';
+        for(let i=1;i<=data.number_of_seasons;i++){
+            const opt=document.createElement('option');
+            opt.value=i; opt.text=`Season ${i}`;
+            seasonSelect.appendChild(opt);
+        }
+        loadEpisodes(data);
     }
-  }
 }
 
-function loadEpisodes(data){
-  const s = seasonSelect.value || 1;
-  episodeSelect.innerHTML="";
-  const total = data.seasons[s-1]?.episode_count || 1;
-  for(let i=1;i<=total;i++){
-    const o=document.createElement("option");
-    o.value=i; o.text=`Episode ${i}`;
-    episodeSelect.appendChild(o);
-  }
-  updateTV();
+function loadEpisodes(tvData){
+    const season=parseInt(seasonSelect.value||1);
+    episodeSelect.innerHTML='';
+    const totalEpisodes=tvData.seasons[season-1]?.episode_count||1;
+    for(let i=1;i<=totalEpisodes;i++){
+        const opt=document.createElement('option');
+        opt.value=i; opt.text=`Episode ${i}`;
+        episodeSelect.appendChild(opt);
+    }
+    updateTVPlayer();
 }
 
-function updateTV(){
-  const s = seasonSelect.value;
-  const e = episodeSelect.value;
-  player.src = `https://vidsrc.cc/v3/embed/tv/${currentId}/${s}/${e}?autoPlay=false`;
+function updateTVPlayer(){
+    const season=parseInt(seasonSelect.value||1);
+    const episode=parseInt(episodeSelect.value||1);
+    playerIframe.src=`https://vidsrc.cc/v3/embed/tv/${currentItemId}/${season}/${episode}?autoPlay=false`;
 }
 
-seasonSelect.onchange = async () => {
-  try {
-    const r = await fetch(`${BACKEND_URL}/api/tv/${currentId}`);
-    const data = await r.json();
-    loadEpisodes(data);
-  } catch {}
-};
-
-episodeSelect.onchange = updateTV;
-
-document.getElementById("search-btn").onclick = () => {
-  const q = document.getElementById("search-input").value.trim();
-  if(q) searchAll(q);
-  else fetchTrending();
-};
-
-document.getElementById("search-input").addEventListener("keypress", e => {
-  if(e.key==="Enter"){
-    const q=e.target.value.trim();
-    if(q) searchAll(q);
-    else fetchTrending();
-  }
+seasonSelect.addEventListener('change',()=>{ 
+    fetch(`https://api.themoviedb.org/3/tv/${currentItemId}?api_key=${API_KEY}`).then(r=>r.json()).then(data=>loadEpisodes(data));
 });
-
-document.getElementById("back-btn").onclick = () => {
-  playerPage.style.display="none";
-  player.src="";
-};
-
-document.getElementById("home-btn").onclick = fetchTrending;
+episodeSelect.addEventListener('change',updateTVPlayer);
 
 fetchTrending();
 </script>
