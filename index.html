@@ -49,8 +49,6 @@ header:hover { color:#00e0ff; }
 #back-btn{ background:#00bfff; border:none; padding:8px 14px; border-radius:8px; cursor:pointer; color:white; }
 #player-wrapper{ flex:1; display:flex; justify-content:center; align-items:center; }
 #player{ width:90%; height:80%; border:none; border-radius:12px; }
-#player-controls{ margin:10px 20px; }
-select { padding:5px; border-radius:8px; border:none; outline:none; font-size:14px; background: rgba(0,191,255,0.1); color:#fff; backdrop-filter: blur(5px); }
 @media(max-width:600px){ #search-input{width:70%;} #player{height:60%;} }
 </style>
 </head>
@@ -69,17 +67,11 @@ select { padding:5px; border-radius:8px; border:none; outline:none; font-size:14
 
 <div id="player-page">
   <div id="player-topbar">
-    <button id="back-btn"> Back</button>
+    <button id="back-btn">Back</button>
     <span id="player-title"></span>
   </div>
   <div id="player-wrapper">
     <iframe id="player" allowfullscreen></iframe>
-  </div>
-  <div id="player-controls">
-    <div id="season-episode-controls" style="display:none;">
-      <select id="season-select"></select>
-      <select id="episode-select"></select>
-    </div>
   </div>
 </div>
 
@@ -98,14 +90,11 @@ const playerPage=document.getElementById('player-page');
 const playerIframe=document.getElementById('player');
 const backBtn=document.getElementById('back-btn');
 const playerTitle=document.getElementById('player-title');
-const seasonSelect=document.getElementById('season-select');
-const episodeSelect=document.getElementById('episode-select');
-const seasonEpisodeControls=document.getElementById('season-episode-controls');
 
 searchBtn.addEventListener('click', ()=>{ const query=searchInput.value.trim(); if(query===''){ fetchTrending(); }else{ searchAll(query); } });
 searchInput.addEventListener('keypress', e=>{ if(e.key==='Enter'){ const query=searchInput.value.trim(); if(query===''){ fetchTrending(); }else{ searchAll(query); } }});
 homeBtn.addEventListener('click', fetchTrending);
-backBtn.addEventListener('click', ()=>{ playerPage.style.display='none'; document.getElementById('controls').style.display='flex'; resultsDiv.style.display='grid'; });
+backBtn.addEventListener('click', ()=>{ playerPage.style.display='none'; playerIframe.src=""; document.getElementById('controls').style.display='flex'; resultsDiv.style.display='grid'; });
 
 async function searchAll(query){
     loader.style.display='block';
@@ -144,48 +133,25 @@ function displayResults(items){
     items.forEach(item=>{
         const card=document.createElement('div');
         card.className='card';
-        card.innerHTML=`<img src="https://image.tmdb.org/t/p/w300${item.poster_path}" alt="${item.title||item.name}"><div class="info"><h3>${item.title||item.name}</h3><p>${item.type.toUpperCase()} | Rating: ${item.vote_average||'N/A'}</p></div>`;
+        card.innerHTML=`<img src="https://image.tmdb.org/t/p/w300${item.poster_path}" alt="${item.title||item.name}"><div class="info"><h3>${item.title||item.name}</h3><p>${item.type.toUpperCase()}</p></div>`;
         card.addEventListener('click',()=>loadPlayer(item.id,item.type,item.title||item.name));
         resultsDiv.appendChild(card);
     });
 }
 
-async function loadPlayer(id,type,title){
+function loadPlayer(id,type,title){
     currentItemId=id;
     currentType=type;
     playerTitle.textContent=title;
     playerPage.style.display='flex';
     document.getElementById('controls').style.display='none';
     resultsDiv.style.display='none';
-    seasonEpisodeControls.style.display='none';
-    if(type==='movie'){ playerIframe.src=`https://vidsrc.cc/v3/embed/movie/${id}?autoPlay=false`; }
-    else{
-        seasonEpisodeControls.style.display='flex';
-        const res=await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}`);
-        const data=await res.json();
-        seasonSelect.innerHTML='';
-        episodeSelect.innerHTML='';
-        for(let i=1;i<=data.number_of_seasons;i++){ const opt=document.createElement('option'); opt.value=i; opt.text=`Season ${i}`; seasonSelect.appendChild(opt); }
-        loadEpisodes(data);
+    if(type==='movie'){ 
+        playerIframe.src=`https://vidsrc.ru/movie/${id}?colour=00ff9d&autoplay=true&autonextepisode=true&backbutton=https%3A%2F%2Fvidsrc.ru%2F&pausescreen=true`; 
+    } else {
+        playerIframe.src=`https://vidsrc.ru/tv/${id}/1/1?colour=00ff9d&autoplay=true&autonextepisode=true&backbutton=https%3A%2F%2Fvidsrc.ru%2F&pausescreen=true`;
     }
 }
-
-function loadEpisodes(tvData){
-    const season=parseInt(seasonSelect.value||1);
-    episodeSelect.innerHTML='';
-    const totalEpisodes=tvData.seasons[season-1]?.episode_count||1;
-    for(let i=1;i<=totalEpisodes;i++){ const opt=document.createElement('option'); opt.value=i; opt.text=`Episode ${i}`; episodeSelect.appendChild(opt); }
-    updateTVPlayer();
-}
-
-function updateTVPlayer(){ const season=parseInt(seasonSelect.value||1); const episode=parseInt(episodeSelect.value||1); playerIframe.src=`https://vidsrc.cc/v3/embed/tv/${currentItemId}/${season}/${episode}?autoPlay=false`; }
-
-seasonSelect.addEventListener('change',()=>{ fetch(`https://api.themoviedb.org/3/tv/${currentItemId}?api_key=${API_KEY}`).then(r=>r.json()).then(data=>loadEpisodes(data)); });
-episodeSelect.addEventListener('change',updateTVPlayer);
-
-document.getElementById('search-btn').onclick=()=>{ const q=document.getElementById('search-input').value; if(q) searchAll(q); else fetchTrending(); };
-document.getElementById('search-input').addEventListener('keypress',e=>{ if(e.key==="Enter"){ const q=e.target.value; if(q) searchAll(q); else fetchTrending(); }});
-document.getElementById('back-btn').onclick=()=>{ playerPage.style.display='none'; playerIframe.src=""; };
 
 fetchTrending();
 </script>
