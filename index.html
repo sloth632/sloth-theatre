@@ -147,9 +147,9 @@ function loadPlayer(id,type,title){
     document.getElementById('controls').style.display='none';
     resultsDiv.style.display='none';
     if(type==='movie'){ 
-        playerIframe.src=`https://vidsrc.ru/movie/${id}?colour=00ff9d&autoplay=true&autonextepisode=true&backbutton=https%3A%2F%2Fsloth-theatre.vercel.app%2F&pausescreen=true`; 
+        playerIframe.src=`https://vsembed.ru/embed/movie?tmdb=${id}`;
     } else {
-        playerIframe.src=`https://vidsrc.ru/tv/${id}/1/1?colour=00ff9d&autoplay=true&autonextepisode=true&backbutton=https%3A%2F%2Fsloth-theatre.vercel.app%2F&pausescreen=true`;
+        playerIframe.src=`https://vsembed.ru/embed/tv?tmdb=${id}`;
     }
 }
 
