@@ -166,8 +166,8 @@ function updatePlayer(){
         if(currentType==='movie'){ playerIframe.src=`https://vsembed.ru/embed/movie?tmdb=${currentItemId}`; } 
         else { playerIframe.src=`https://vsembed.ru/embed/tv?tmdb=${currentItemId}`; }
     } else {
-        if(currentType==='movie'){ playerIframe.src=`https://vidsrc.ru/movie/${currentItemId}?colour=0095ff&autoplay=false&autonextepisode=true`; } 
-        else { playerIframe.src=`https://vidsrc.ru/tv/${currentItemId}/1/1?colour=0095ff&autoplay=false&autonextepisode=true`; }
+        if(currentType==='movie'){ playerIframe.src=`https://vidsrc.ru/movie/${currentItemId}?colour=0095ff&autoplay=true&autonextepisode=true`; } 
+        else { playerIframe.src=`https://vidsrc.ru/tv/${currentItemId}/1/1?colour=0095ff&autoplay=true&autonextepisode=true`; }
     }
 }
 fetchTrending();
