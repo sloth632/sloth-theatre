@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://sloth-theatre.pages.dev/logo.png" alt="Sloth Theatre Logo" width="120" />
+  <img src="https://github.com/sloth632/sloth-theatre/blob/main/sloth-pictures/sloth-logo.png" alt="Sloth Theatre Logo" width="120" />
   <h1>SLOTH theatre</h1>
   <br />
   <h3>Stream Movies, TV Shows & Anime Instantly</h3>
@@ -52,10 +52,7 @@
 ---
 
 ## Notes
-- Frontend only
-- No backend used
-- No media hosted locally
-- Best used with ad-blocker enabled
+- Use AD-BLOCKER for best experience 
 
 ---
 
